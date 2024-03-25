@@ -3,7 +3,7 @@
 // active les notifications web
 user_pref("dom.webnotifications.enabled",	                true);
 
-// désactive le dom api
+// Active le dom api
 user_pref("dom.enable_performance",		                    false);
 
 // désactive la ressource timing API
@@ -16,8 +16,8 @@ user_pref("dom.enable_user_timing",			                false);
 // Désactive la localisation 
 user_pref("geo.enabled",					                false);
 
-// Désactive l'API AudioWeb
-user_pref("dom.webaudio.enabled",				            false);
+// Active l'API AudioWeb
+user_pref("dom.webaudio.enabled",				            true);
 
 // Force localisation par wifi sur le
 // serveur mozilla
@@ -120,18 +120,18 @@ user_pref("javascript.options.wasm",				        true);
 // Désactive la reconnaissance faciale  
 user_pref("camera.control.face_detection.enabled",		    false);
 
-// Désactive la recherche localisée (GeoIp)
-user_pref("browser.search.countryCode",				        "FR");
-user_pref("browser.search.region",				            "FR");
-user_pref("browser.search.geoip.url",				        "");
+// Active la recherche localisée (GeoIp)
+//user_pref("browser.search.countryCode",				        "FR");
+//user_pref("browser.search.region",				            "FR");
+//user_pref("browser.search.geoip.url",				        "");
 
 // Force l'utilisation de l'heure et date Firefox comme
 // heure locale
-user_pref("intl.locale.matchOS",				            false);
+user_pref("intl.locale.matchOS",				            true);
 
 // Désactive le moteur de recherche par défeut suivant
 // la localisation 
-user_pref("browser.search.geoSpecificDefaults",			    false);
+user_pref("browser.search.geoSpecificDefaults",			    true);
 
 // Laisse l'envoi automatique de la sélection
 // vers le presse papier sur linux
@@ -153,7 +153,7 @@ user_pref("browser.urlbar.speculativeConnect.enabled",      false);
 
 // Autorise le remplacement d'un nom de domaine saisi
 // invalide
-user_pref("browser.fixup.alternate.enabled",		    	false);
+user_pref("browser.fixup.alternate.enabled",		    	true);
 
 // Autorise la gestion automatique du mode hors ligne
 // par le navigateur
@@ -178,10 +178,10 @@ user_pref("security.fileuri.strict_origin_policy",		    true);
 //  Autorise l'affichage de Javascript dans l'historique
 user_pref("browser.urlbar.filter.javascript",			    false);
 
-// Désactive la prise en charge d'asm.js qui permet 
+// AUtorise la prise en charge d'asm.js qui permet 
 // l'exécution de script écrit dans des languages 
 // de bas niveau (utilisé pour le jeux)
-user_pref("javascript.options.asmjs",			        	false);
+user_pref("javascript.options.asmjs",			        	true);
 
 // Autorise les polices SVG
 user_pref("gfx.font_rendering.opentype_svg.enabled",		true);
@@ -309,17 +309,17 @@ user_pref("browser.safebrowsing.phishing.enabled",		    true);
 // Bloque les sites reported comme attaquants 
 user_pref("browser.safebrowsing.malware.enabled",		    true);
 
-// Bloque les requêtes vers l'application de réputation
+// Autorise les requêtes vers l'application de réputation
 // de Google pour les téléchargement de fichier binaires
-user_pref("browser.safebrowsing.downloads.remote.enabled",	false);
+user_pref("browser.safebrowsing.downloads.remote.enabled",	true);
 
 // Désactive Pocket (compte nécéssaire)
 user_pref("browser.pocket.enabled",				            false);
 user_pref("extensions.pocket.enabled",				        false);
 
-// Désactive les recommandations de Pocket dans Firefox
+// Active les recommandations de Pocket dans Firefox
 // Quantum
-user_pref("browser.newtabpage.activity-stream.feeds.section.topstories",	false);
+user_pref("browser.newtabpage.activity-stream.feeds.section.topstories",	true);
 
 // Ferme la session utilisateur au bout de 90 secondes sur
 // un site (désactivé)
@@ -338,7 +338,7 @@ user_pref("network.predictor.enabled",				        false);
 // Rejeter les noms de domaines en .onion
 user_pref("network.dns.blockDotOnion",			        	true);
 
-// Désactive les suggestions de recherches dans la barre
+// Active les suggestions de recherches dans la barre
 // de navigation 
 user_pref("browser.search.suggest.enabled",			        true);
 
@@ -354,7 +354,7 @@ user_pref("browser.casting.enabled",				        false);
 
 // Autorise le chargement du codec OpenH264
 user_pref("media.gmp-gmpopenh264.enabled",			        true);
-user_pref("media.gmp-manager.url",				            "");
+//user_pref("media.gmp-manager.url",				            "");
 
 // Désactive les téléchargement des snippets de la
 // page d'acceuil
