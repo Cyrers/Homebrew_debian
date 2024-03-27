@@ -1,0 +1,18 @@
+- hosts: machine
+  remote_user: vboxuser
+  become: true  # Enable privilege escalation
+  become_method: sudo  # Use sudo for escalation
+  tasks:
+    - name: create test file
+      file:
+        path: /tmp/ansible_test_file
+        state: touch
+    - name: Print message with echo
+      shell:
+        cmd: echo "Hello, World!" >> /tmp/ansible_test_file
+    # - name: Print message with echo
+    #   shell:
+    #     cmd: 
+    #       - touch /tmp/ansible_test_file
+    #       - echo "Hello, World!" >> /tmp/ansible_test_file
+    

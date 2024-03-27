@@ -1,0 +1,278 @@
+- hosts: machine
+  remote_user: vboxuser
+  become: true  # Enable privilege escalation
+  become_method: sudo  # Use sudo for escalation
+  tasks:
+    # - name: force_robust_passwords
+      # lineinfile:
+      #   dest: /etc/pam.d/common-password
+      #   line : 
+      #     - 'password requisite pam_pwquality.so retry=3 minclass=3 minlen=10 remember=5'
+      #   state: present
+    # Les trois prochaines taches cassent la connexion avec un mdp, il faut retravailler tout ça plus tard
+    #- name: forcer la modification de mdp regulierement (max_days)
+      # lineinfile:
+      #   dest: /etc/login.defs
+      #   regexp: '^PASS_MAX_DAYS.*$'
+      #   line: 'PASS_MAX_DAYS 90'
+      #   state: present
+      #   insertafter: '^PASS_MAX_DAYS.*$'
+    #- name: forcer la modification de mdp regulierement (min_days)
+      # lineinfile:
+      #   dest: /etc/login.defs
+      #   regexp: '^PASS_MIN_DAYS.*$'
+      #   line: 'PASS_MIN_DAYS 0'
+      #   state: present
+      #   insertafter: '^PASS_MIN_DAYS.*$'
+    #- name: forcer la modification de mdp regulierement (warn_age)
+      # lineinfile:
+      #   dest: /etc/login.defs
+      #   regexp: '^PASS_WARN_AGE.*$'
+      #   line: 'PASS_WARN_AGE 10'
+      #   state: present
+      #   insertafter: '^PASS_WARN_AGE.*$'
+    - name: update packages
+      ansible.builtin.command: apt-get update
+      ignore_errors: true
+        
+    - name: install unattended-upgrades
+      apt:
+        upgrade: yes
+    - name: installation des updates de maniere automatique
+      apt:
+        name: 
+        - unattended-upgrades
+        - apt-listchanges
+        state: present
+    - name: Uncomment line in configuration file
+      ansible.builtin.lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: '^.*"origin=Debian,codename=\$\{distro_codename\}-updates";'
+        line: '        "origin=Debian,codename=${distro_codename}-updates";'
+        state: present
+    - name: Uncomment line in configuration file
+      ansible.builtin.lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: '^.*origin=Debian,codename=\$\{distro_codename\}-proposed-updates";'
+        line: '        "origin=Debian,codename=${distro_codename}-proposed-updates";'
+        state: present
+    - name: Uncomment line in configuration file
+      ansible.builtin.lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: '^.*origin=Debian,codename=\$\{distro_codename\},label=Debian";'
+        line: '        "origin=Debian,codename=${distro_codename},label=Debian";'
+        state: present
+    - name: Uncomment line in configuration file
+      ansible.builtin.lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: '^.*origin=Debian,codename=\$\{distro_codename\},label=Debian-Security";'
+        line: '        "origin=Debian,codename=${distro_codename},label=Debian-Security";'
+        state: present
+    - name: Uncomment line in configuration file
+      ansible.builtin.lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: '^.*origin=Debian,codename=\$\{distro_codename\}-security,label=Debian-Security";'
+        line: '        "origin=Debian,codename=${distro_codename}-security,label=Debian-Security";'
+        state: present
+    - name: Uncomment line in configuration file
+      ansible.builtin.lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: '^.*Unattended-Upgrade::Mail "root";'
+        line: 'Unattended-Upgrade::Mail "root";'
+        state: present
+    - name: Creation du fichier 20auto-upgrades
+      shell: 
+        cmd : touch /etc/apt/apt.conf.d/20auto-upgrades
+    - name: modification du fichier 20auto-upgrade
+      lineinfile:
+        dest : '/etc/apt/apt.conf.d/20auto-upgrades'
+        line : 'APT::Periodic::Update-Package-Lists "1";'
+        state: present
+    - name: modification du fichier 20auto-upgrade
+      lineinfile:
+        dest : '/etc/apt/apt.conf.d/20auto-upgrades'
+        line : 'APT::Periodic::Unattended-Upgrade "1";'
+        state: present
+    - name: Créer un fichier de configuration unattended-upgrades
+      shell: 
+        cmd : dpkg-reconfigure -plow unattended-upgrades
+    - name: Valider la configuration
+      shell:
+        cmd : unattended-upgrades --dry-run
+
+    - name: Choisir la première option (si nécessaire)
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        line: 'APT::Periodic::Unattended-Upgrade "1";'
+        state: present
+        insertbefore: '^APT::Periodic::Unattended-Upgrade.*$'
+    - name: Creation de 02periodic
+      shell: 
+        cmd : touch /etc/apt/apt.conf.d/02periodic
+    - name: Ajout des lignes dans 02periodic
+      lineinfile:
+        dest: /etc/apt/apt.conf.d/02periodic
+        line: 
+          - // Control parameters for cron jobs by /etc/cron.daily/apt-compat //
+          - // Enable the update/upgrade script (0=disable)
+          - APT::Periodic::Enable "1";
+
+
+          - // Do "apt-get update" automatically every n-days (0=disable)
+          - APT::Periodic::Update-Package-Lists "1";
+
+
+          - // Do "apt-get upgrade --download-only" every n-days (0=disable)
+          - APT::Periodic::Download-Upgradeable-Packages "1";
+
+
+          - // Run the "unattended-upgrade" security upgrade script
+          - // every n-days (0=disabled)
+          - // Requires the package "unattended-upgrades" and will write
+          - // a log in /var/log/unattended-upgrades
+          - APT::Periodic::Unattended-Upgrade "1";
+
+
+          - // Do "apt-get autoclean" every n-days (0=disable)
+          - APT::Periodic::AutocleanInterval "21";
+
+
+          - // Send report mail to root
+          - "//     0:  no report             (or null string)"
+          - "//     1:  progress report       (actually any string)"
+          - "//     2:  + command outputs     (remove -qq, remove 2>/dev/null, add -d)"
+          - "//     3:  + trace on"
+          - APT::Periodic::Verbose "2";
+    # Application de R62 M Desactiver les services inutiles
+    # A faire à la main pour eviter de tout faire exploser.
+    # Application de R68 M Proteger les mots de passe stockes
+    - name: protection des mots de passe stockés
+      lineinfile:
+        dest: /etc/pam.d/common-password
+        regexp: '^password [success=1 default=ignore] pam_unix.so obscure.*'
+        line: 'password [success=1 default=ignore] pam_unix.so obscure use_authtok try_first_pass yescrypt rounds=11'
+        state: present
+    - name: verification de l'ajout
+      lineinfile:
+        dest: /etc/pam.d/common-password
+        search_string: 'password [success=1 default=ignore] pam_unix.so obscure use_authtok try_first_pass yescrypt rounds=11'
+        state: present
+    # Application de R80 M Reduire la surface d'attaque des services reseau
+    # A faire au cas par cas
+
+    # Niveau MI 
+    # Application de R2 MI Configurer le bios
+    # A faire à la main car cela implique une configuration materielle (desactivation des ports inutiles mais cela ne sert a rien sur une VM)
+    # Application de R3 MI Activation d'un démarage sécurisé UEFI
+    # A faire à la main, n'est pas faisable sur une VM
+    # Application de R5 MI Configuration d'un mot de passe sur grub
+    # Ne sera pas fait car cela rendra l'utilisation de la machine une opération fastidieuse
+    # Guide de mise en place a https://hackmd.io/@Hypolite/SyhXPi5ea/view partie R5
+    # Application de R8 Parametrer les options de configuration memoire
+    # Ne sera pas fait car cela rendra l'utilisation de la machine une opération fastidieuse
+    # Guide de mise en place a https://hackmd.io/@Hypolite/SyhXPi5ea/view partie R8
+    # Application de R9 MI Paramétrer les options de configuration du noyau
+    # Non applicable
+    # Application de R11 MI Activer et configurer le LSM Yama
+    # Guide d'application a https://hackmd.io/@Hypolite/SyhXPi5ea/view partie R11
+    - name: activation du LSM Yama
+      lineinfile:
+        dest: /etc/sysctl.conf
+        line: 
+        - 'security = yama'
+        - 'kernel.yama.ptrace_scope = 1'
+        state: present
+    # Application de R12 MI Paramétrer les options de configuration du réseau IPv4
+    # Non applicable
+    # Application de R13 MI Désactiver le plan IPv6
+    # IPv6 conservé car utile pour les outils de monitoring ajoutés ultérieurement
+    # Application de R14 MI Paramétrer les options de configuration des systèmes de fichiers
+    - name: Paramétrer les options de configuration des systèmes de fichiers
+      lineinfile:
+        dest: /etc/sysctl.conf
+        line: 
+          - # Désactive la création de coredump pour les exécutables setuid
+          - # Notez qu'il est possible de désactiver tous les coredumps avec la
+          - # configuration CONFIG_COREDUMP=n
+          - fs.suid_dumpable = 0
+          - # Disponible à partir de la version 4.19 du noyau Linux , permet d'interdire
+          - # l'ouverture des FIFOS et des fichiers "réguliers" qui ne sont pas la propriété
+          - # de l'utilisateur dans les dossiers sticky en écriture pour tout le monde.
+          - fs.protected_fifos=2
+          - fs.protected_regular=2
+          - # Restreint la création de liens symboliques à des fichiers dont l'utilisateur
+          - # est propriétaire. Cette option fait partie des mécanismes de prévention contre
+          - # les vulnérabilités de la famille Time of Check - Time of Use (Time of Check -
+          - # Time of Use)
+          - fs.protected_symlinks=1
+          - # Restreint la création de liens durs à des fichiers dont l'utilisateur est
+          - # propriétaire. Ce sysctl fait partie des mécanismes de prévention contre les
+          - # vulnérabilités Time of Check - Time of Use, mais aussi contre la possibilité de
+          - # conserver des accès à des fichiers obsolètes
+          - fs.protected_hardinks=1
+        state: present
+    # Application de R28 MI Partitionnement type
+    # Non applicable : c'est pour la mise en place de partionnement de serveur
+    # Application de R32 MI Expirer les sessions utilisateur locales
+    # Ne sera pas fait car cela rendra l'utilisation de la machine une opération fastidieuse
+    # Guide de mise en place a https://hackmd.io/@Hypolite/SyhXPi5ea/view partie R32
+    # Application de R33 MI Assurer l’imputabilité des actions d’administration
+    - name: Assurer l’imputabilité des actions d’administration
+      apt:
+        name: auditd
+        state: present
+    - name: Modifier le fichier /etc/default/grub
+      lineinfile:
+        path: /etc/default/grub
+        line: 'GRUB_CMDLINE_LINUX_DEFAULT=".*"'
+        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="(.*)"'
+        insertafter: '"$1 audit=1"'
+        state: present
+    - name: Mettre à jour le fichier de configuration GRUB
+      shell: grub2-mkconfig -o /boot/grub2/grub.cfg
+    - name: Modifier le fichier /etc/pam.d/sshd
+      lineinfile:
+        path: /etc/pam.d/sshd
+        regexp: '^session required pam_loginuid.so.*'
+        line: 'require_auditd'
+        insertafter: '^session required pam_loginuid.so.*'
+        state: present
+    - name: Redémarrer le service SSH
+      service:
+        name: sshd # Verifier que ça ne bloque pas l'utilisation du script total
+        state: restarted
+    # Application de R34 MI Désactiver les comptes de service
+    # Ne sera pas appliqué, ce doit être fait à la main
+    # Application de R35 MI Modifier les directives de configuration sudo
+    - name: Installation de sudo
+      apt:
+        name: sudo
+        state: present
+    - name: Modification du fichier /etc/sudoers
+      lineinfile:
+        path: /etc/sudoers
+        line: 
+          - Defaults noexec,requiretty,use_pty,umask=0027
+          - Defaults ignore_dot,env_reset
+        state: present
+    
+    # Application de R40 MI Utiliser des utilisateurs cibles non-privilégiés pour les commandes sudo
+    # Ne sera pas appliqué, c'est une directive à appliquer à l'utilisation de la machine
+    # Application de R42 MI Bannir les négations dans les spécifications sudo
+    # Ne sera pas appliqué, c'est une directive d'utilisation du système
+    # Application de R43 MI Préciser les arguments dans les spécifications sudo
+    # Ne sera pas appliqué, c'est une directive d'utilisation du système
+    # Application de R44 MI Éditer les fichiers de manière sécurisée avec sudo
+    # C'est une mesure à appliquer au cas par cas
+    - name: Restart computer
+      reboot:
+        reboot_timeout: 600
+        msg: "Rebooting the system"
+
+  handlers:
+    - name: restart ssh
+      service:
+        name : sshd
+        state : restarted
+
+
