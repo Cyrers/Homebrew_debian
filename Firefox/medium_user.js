@@ -1,4 +1,4 @@
-// Fichier qui regroupe les préférence du navigateur firefox pour le profil "soft"
+// Fichier qui regroupe les préférence du navigateur firefox pour le profil "medium"
 
 // Désactive les notifications web
 user_pref("dom.webnotifications.enabled",	                false);

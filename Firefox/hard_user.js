@@ -1,4 +1,4 @@
-// Fichier qui regroupe les préférence du navigateur firefox pour le profil "soft"
+// Fichier qui regroupe les préférence du navigateur firefox pour le profil "hard"
 
 // Désactive les notifications web
 user_pref("dom.webnotifications.enabled",	                false);
@@ -489,3 +489,6 @@ user_pref("security.password_lifetime",				        5);
 // Bloquer les notification pour le sites qui offrent des 
 // données hors ligne
 user_pref("browser.offline-apps.notify",		        	false);
+
+// Désactive Javascript
+user_pref("javascript.enabled",					            false);
