@@ -1,0 +1,5 @@
+all:
+ hosts:
+   machine:
+    ansible_host: machine
+    ansible_user: vboxuser
