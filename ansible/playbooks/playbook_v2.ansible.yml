@@ -152,7 +152,7 @@
     # Ne sera pas fait car cela rendra l'utilisation de la machine une opération fastidieuse
     # Guide de mise en place a https://hackmd.io/@Hypolite/SyhXPi5ea/view partie R8
     # Application de R9 MI Paramétrer les options de configuration du noyau
-    # Non applicable
+    # Rend la machine inutilisable car celle-ci devient briquée (tout les droits pour résoudre le problèmes sont retirés)
     # Application de R11 MI Activer et configurer le LSM Yama
     # Guide d'application a https://hackmd.io/@Hypolite/SyhXPi5ea/view partie R11
     - name: Activer et configurer le LSM Yama
@@ -165,7 +165,7 @@
     # Application de R12 MI Paramétrer les options de configuration du réseau IPv4
     # Non applicable
     # Application de R13 MI Désactiver le plan IPv6
-    # IPv6 conservé car utile pour les outils de monitoring ajoutés ultérieurement
+    # IPv6 conservé car utile (probablement) pour les outils de monitoring ajoutés ultérieurement
     # Application de R14 MI Paramétrer les options de configuration des systèmes de fichiers
     - name: Paramétrer les options de configuration des systèmes de fichiers
       blockinfile:
@@ -255,11 +255,23 @@
       reboot:
         reboot_timeout: 600
         msg: "Rebooting the system"
-
+    # Règles a ajouter : 50, 52, 55, 63, 67, 69, 70, 74, 75, 79
+    # Application de R50 MI Restreindre les droits d'accès aux fichiers et aux répertoires sensibles
+    # Ne sera pas appliqué, c'est du cas par cas faudrais lister l'ensemble des fichiers avec leur apartenance
+    # Application de R52 MI Restreindre les accès aux sockets et aux pipes nommées
+    # Cas par cas également, il faudrais lister l'ensemble des sockets et pipes
+    # et les restreindre au stricte nécessaire
+    # Application de R55 MI Séparer les répertoires temporaires des utilisateurs
+    # http://www.chiark.greenend.org.uk/~peterb/uxsup/project/tmp-per-user/ 
+    # J'ai trouvé ça mais je ne suis pas sûr que y'aie pas une backdoor dedans.
+    # Application de R63 MI Désactiver les fonctionnalités des services non essentielles
+    # Cas par cas, notamment il faut configurer Exim, Postfix, ntpd, Bind
+    
   handlers:
     - name: restart ssh
       service:
         name : sshd
         state : restarted
+
 
 

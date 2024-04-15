@@ -1,0 +1,60 @@
+- hosts: machine
+  remote_user: vboxuser
+  become_user: root
+  become: true  # Enable privilege escalation
+  tasks:
+    - name: Install pip & php
+      apt:
+        name:
+          - php
+          - python3-full
+          - pipx
+          - git
+        state: present
+    - name: Create venv for python3
+      command: 
+        cmd:
+          - mkdir /home/vboxuser/venv_python3
+          - python3 -m venv /home/vboxuser/venv_python3
+    - name: Add python and pip to PATH
+      blockinfile:
+        path: /home/vboxuser/.bashrc
+        block: |
+          export PATH="$PATH:/home/vboxuser/venv_python3/bin/"
+    - name: Install arachnid-spider
+      command:
+        cmd: pipx install arachnid-spider
+    - name: Add stuff to path
+      command:
+        cmd: pipx ensurepath
+    - name: Create EmailHarvester directory
+      command:
+        cmd: mkdir /home/vboxuser/EmailHarvester
+    - name: Install EmailHarvester
+      git:
+        repo: https://github.com/maldevel/EmailHarvester
+        dest: /home/vboxuser/EmailHarvester
+        clone: yes
+    - name: Install EmailHarvester requirements
+      command:
+        cmd: pip install -r /home/vboxuser/EmailHarvester/requirements.txt
+    - name: Install email2phonenumber stuff
+      pip:
+        name: 
+          - beautifulsoup4
+          - requests
+    - name: Create email2phonenumber directory
+      command:
+        cmd: mkdir /home/vboxuser/email2phonenumber
+    - name: Install email2phonenumber
+      git:
+        repo: https://github.com/martinvigo/email2phonenumber
+        dest: /home/vboxuser/email2phonenumber
+        clone: yes
+    - name: Install email2phonenumber requirements
+      command:
+        cmd: pip install -r /home/vboxuser/email2phonenumber/requirements.txt
+    
+    
+    
+    
